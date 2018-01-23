@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:body>
+    <ui:composition template="/template.xhtml">
+        <ui:define name="divMain">
+            <h:form id="form" enctype="multipart/form-data">
+                <p:panel style="text-align: center">
+                    <h:outputText value="Просмотр, импорт товаров"/>
+                </p:panel>
+                <p:dataTable id="descriptionTable" var="description" value="#{descriptionBean.descriptionList}"
+                             paginator="true" rows="10" paginatorPosition="bottom"
+                             paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             rowsPerPageTemplate="5,10,15">
+
+                    <p:column headerText="serialNumber">
+                        <h:outputText value="#{description.serialNumber}"/>
+                    </p:column>
+
+                    <p:column headerText="name">
+                        <h:outputText value="#{description.name}"/>
+                    </p:column>
+
+                    <p:column headerText="description">
+                        <h:outputText value="#{description.description}"/>
+                    </p:column>
+
+                    <p:column headerText="productionDate">
+                        <h:outputText value="#{description.productionDate}" converter="dateConverter">
+                        </h:outputText>
+                    </p:column>
+                </p:dataTable>
+
+                <p:panelGrid columns="3">
+                    <f:facet name="header">Загрузка элементов из файла</f:facet>
+
+                    <p:fileUpload value="#{descriptionBean.file}" mode="simple" skinSimple="true"
+                                  description="Select"/>
+                    <p:spacer width="40px;"/>
+                    <p:commandButton value="Submit" ajax="false" actionListener="#{descriptionBean.uploadFile}"/>
+                </p:panelGrid>
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</h:body>
+</html>

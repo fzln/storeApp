@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:body>
+    <ui:composition template="/template.xhtml">
+        <ui:define name="divMain">
+            <h:form id="form">
+                <p:growl id="msgs" showDetail="true"/>
+                <p:panel style="text-align: center">
+                    <h:outputText value="Создание, просмотр заказов"/>
+                </p:panel>
+                <p:panelGrid>
+                    <p:commandLink value="#{msg['create']}" icon="ui-icon-plus"
+                                   actionListener="#{orderSession.newOrder}"
+                                   update=":orderAddForm"
+                                   onclick="PF('addDlg').show()"/>
+                </p:panelGrid>
+
+                <p:dataTable id="orderTable" var="orderVar"
+                             value="#{orderBean.orderList}"
+                             editable="true" style="margin-bottom:20px"
+                             emptyMessage="#{msg.noRecords}">
+
+                    <p:ajax event="rowEdit" listener="#{orderBean.onRowEdit}" update=":form:msgs"/>
+                    <p:ajax event="rowEditCancel" listener="#{orderBean.onRowCancel}"
+                            update=":form:msgs"/>
+
+                    <p:column headerText="idOrder" style="text-align:left;width:50px">
+                        <h:outputText value="#{orderVar.idOrder}"/>
+                    </p:column>
+
+                    <p:column headerText="customerName" style="text-align:left;width:150px">
+                        <p:cellEditor>
+                            <f:facet name="output"><h:outputText value="#{orderVar.customerName}"/></f:facet>
+                            <f:facet name="input"><p:inputText value="#{orderVar.customerName}"
+                                                               required="true" style="width:100%"/></f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column headerText="customerAddress" style="text-align:left;width:250px">
+                        <p:cellEditor>
+                            <f:facet name="output"><h:outputText value="#{orderVar.customerAddress}"/></f:facet>
+                            <f:facet name="input"><p:inputText value="#{orderVar.customerAddress}"
+                                                               style="width:100%"/></f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column headerText="totalAmount" style="text-align:right;width:100px">
+                        <p:cellEditor>
+                            <f:facet name="output"><h:outputText value="#{orderVar.totalAmount}"/></f:facet>
+                            <f:facet name="input"><p:inputText value="#{orderVar.totalAmount}"
+                                                               style="width:100%"/></f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column headerText="createdDate" style="text-align:left;width:80px">
+                        <p:cellEditor>
+                            <f:facet name="output"><h:outputText converter="calendarConverter"
+                                                                 value="#{orderVar.createdDate}">
+                            </h:outputText>
+                            </f:facet>
+                            <f:facet name="input"><p:inputText value="#{orderVar.createdDate}"
+                                                               converter="calendarConverter" required="true"
+                                                               title="00.00.0000" style="width:100%">
+                                <f:validateLength minimum="10"/>
+                            </p:inputText>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+                    <p:column headerText="C" style="text-align:right;width:20px">
+                        <p:commandLink title="Товары" action="#{orderSession.actionOrder(orderVar)}">
+                            <h:outputText value="#{orderBean.countByIdOrder(orderVar)}"/>
+                        </p:commandLink>
+                    </p:column>
+                    <p:column headerText="Edit" style="width:24px;align-content:center">
+                        <p:rowEditor/>
+                    </p:column>
+
+                    <p:column style="width:40px;align-content: center">
+                        <f:facet name="header">Action</f:facet>
+                        <p:commandLink value="Delete"
+                                       action="#{orderBean.deleteOrder(orderVar)}"
+                                       update="orderTable">
+                            <p:confirm header="Confirmation #{orderVar.idOrder}" message="Are you sure?"
+                                       icon="ui-icon-alert"/>
+                        </p:commandLink>
+                    </p:column>
+                </p:dataTable>
+                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                    <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>
+                    <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"/>
+                </p:confirmDialog>
+            </h:form>
+
+            <p:dialog header="Add" widgetVar="addDlg" modal="true" closeOnEscape="true" styleClass="dialogClass">
+                <h:form id="orderAddForm">
+                    <p:panelGrid columns="2" style="width: 100px">
+
+                        <f:facet name="header">Новый элемент</f:facet>
+                        <h:outputLabel for="idOrder" value="idOrder: "/>
+                        <p:inputText id="idOrder" title="000"
+                                     value="#{orderSession.orderItems.idOrder}" required="true"/>
+                        <h:outputLabel for="customerName" value="customerName: "/>
+                        <p:inputText id="customerName" value="#{orderSession.orderItems.customerName}" required="true"/>
+                        <h:outputLabel for="customerAddressLabel" value="address: "/>
+                        <p:inputText id="customerAddressLabel"
+                                     value="#{orderSession.orderItems.customerAddress}"/>
+                        <h:outputLabel for="totalAmount" value="totalAmount: "/>
+                        <p:inputText id="totalAmount"
+                                     value="#{orderSession.orderItems.totalAmount}"/>
+
+                        <h:outputLabel for="createdDate" value="createdDate: "/>
+                        <p:inputText id="createdDate" required="true" converter="calendarConverter"
+                                     value="#{orderSession.orderItems.createdDate}"
+                                     title="00.00.0000">
+                            <f:validateLength minimum="10"/>
+                        </p:inputText>
+
+                        <p:commandButton value="#{msg.create}" icon="ui-icon-plus"
+                                         action="#{orderBean.createOrderFromSession}"
+                                         update=":form:msgs :form:orderTable"
+                                         oncomplete="PF('addDlg').hide();"/>
+
+                        <p:commandButton value="#{msg.cancel}" icon="ui-icon-cancel"
+                                         actionListener="#{orderSession.resetOrder}"
+                                         onclick="PF('addDlg').hide();" type="button"/>
+                    </p:panelGrid>
+                </h:form>
+            </p:dialog>
+        </ui:define>
+    </ui:composition>
+</h:body>
+</html>

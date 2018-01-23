@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:body>
+    <ui:composition template="/template.xhtml">
+        <ui:define name="divMain">
+            <h:form id="form">
+                <p:growl id="msgs" showDetail="true"/>
+                <p:panel style="text-align: center">
+                    <h:outputText value="Создание, экспорт товаров"/>
+                </p:panel>
+                <p:panelGrid>
+                    <p:commandLink value="#{msg['create']}" icon="ui-icon-plus"
+                                   actionListener="#{descriptionTempSession.newDescription}"
+                                   update=":descriptionAddForm"
+                                   onclick="PF('addDlg').show()"/>
+                    <p:spacer width="40px;"/>
+
+                    <p:commandLink value="Очистить" action="#{descriptionTempBean.clearDescriptionList}"
+                                   update=":form:descriptionTable"/>
+                    <p:spacer width="40px;"/>
+
+                    <p:commandLink value="СохранитьВФайл" ajax="false"
+                                   actionListener="#{descriptionTempBean.saveToFile}"
+                                   icon="ui-icon-arrowthick-1-s">
+                        <p:fileDownload value="#{descriptionTempBean.file}"/>
+                    </p:commandLink>
+
+                </p:panelGrid>
+                <p:dataTable id="descriptionTable" var="descriptionVar"
+                             value="#{descriptionTempBean.descriptionList}"
+                             editable="true" style="margin-bottom:20px"
+                             emptyMessage="#{msg.noRecords}">
+
+                    <p:ajax event="rowEdit" listener="#{descriptionTempBean.onRowEdit}" update=":form:msgs"/>
+                    <p:ajax event="rowEditCancel" listener="#{descriptionTempBean.onRowCancel}"
+                            update=":form:msgs"/>
+
+                    <p:column headerText="serial" style="text-align:left;width:50px">
+                        <p:cellEditor>
+                            <f:facet name="output"><h:outputText value="#{descriptionVar.serialNumber}"/></f:facet>
+                            <f:facet name="input"><p:inputText value="#{descriptionVar.serialNumber}"
+                                                               title="000000" required="true" style="width:100%">
+                                <f:validateLength minimum="6" maximum="6"/>
+                            </p:inputText>
+
+                            </f:facet>
+
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column headerText="name" style="text-align:left;width:150px">
+                        <p:cellEditor>
+                            <f:facet name="output"><h:outputText value="#{descriptionVar.name}"/></f:facet>
+                            <f:facet name="input"><p:inputText value="#{descriptionVar.name}"
+                                                               required="true" style="width:100%"/></f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column headerText="description" style="text-align:left;width:250px">
+                        <p:cellEditor>
+                            <f:facet name="output"><h:outputText value="#{descriptionVar.description}"/></f:facet>
+                            <f:facet name="input"><p:inputText value="#{descriptionVar.description}"
+                                                               style="width:100%"/></f:facet>
+                        </p:cellEditor>
+                    </p:column>
+
+                    <p:column headerText="productionDate" style="text-align:left;width:70px">
+                        <p:cellEditor>
+                            <f:facet name="output">
+                                <h:outputText value="#{descriptionVar.productionDate}" converter="dateConverter"/>
+                            </f:facet>
+                            <f:facet name="input">
+                                <p:inputText value="#{descriptionVar.productionDate}"
+                                             converter="dateConverter" title="00.00.0000" style="width:100%">
+                                    <f:validateLength minimum="10"/>
+                                </p:inputText>
+                            </f:facet>
+                        </p:cellEditor>
+                    </p:column>
+                    <p:column headerText="Edit" style="width:24px;align-content:center">
+                        <p:rowEditor/>
+                    </p:column>
+
+                    <p:column style="width:40px;align-content: center">
+                        <f:facet name="header">Action</f:facet>
+                        <p:commandLink value="Delete"
+                                       action="#{descriptionTempBean.deleteDescription(descriptionVar)}"
+                                       update="descriptionTable">
+                            <p:confirm header="Confirmation #{descriptionVar.serialNumber}" message="Are you sure?"
+                                       icon="ui-icon-alert"/>
+                        </p:commandLink>
+                    </p:column>
+                </p:dataTable>
+                <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                    <p:commandButton value="Yes" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check"/>
+                    <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close"/>
+                </p:confirmDialog>
+            </h:form>
+
+            <p:dialog header="Add" widgetVar="addDlg" modal="true" closeOnEscape="true" styleClass="dialogClass">
+                <h:form id="descriptionAddForm">
+                    <p:panelGrid columns="2" style="width: 100px">
+                        <f:facet name="header">
+                            Новый элемент
+                        </f:facet>
+                        <h:outputLabel for="serial" value="serial: "/>
+                        <p:inputText id="serial" title="000000"
+                                     value="#{descriptionTempSession.description.serialNumber}" required="true">
+                            <f:validateLength minimum="6" maximum="6"/>
+                        </p:inputText>
+                        <h:outputLabel for="name" value="name: "/>
+                        <p:inputText id="name" value="#{descriptionTempSession.description.name}" required="true"/>
+                        <h:outputLabel for="descriptionLabel" value="description: "/>
+                        <p:inputText id="descriptionLabel"
+                                     value="#{descriptionTempSession.description.description}"/>
+                        <h:outputLabel for="productionDate" value="prod.Date: "/>
+                        <p:inputText id="productionDate"
+                                     value="#{descriptionTempSession.description.productionDate}"
+                                     converter="dateConverter" title="00.00.0000">
+                            <f:validateLength minimum="10"/>
+                        </p:inputText>
+
+                        <p:commandButton value="#{msg.create}" icon="ui-icon-plus"
+                                         action="#{descriptionTempBean.createDescriptionFromSession}"
+                                         update=":form:msgs :form:descriptionTable"
+                                         oncomplete="PF('addDlg').hide();"/>
+
+                        <p:commandButton value="#{msg.cancel}" icon="ui-icon-cancel"
+                                         actionListener="#{descriptionSession.resetDescription}"
+                                         onclick="PF('addDlg').hide();" type="button"/>
+                    </p:panelGrid>
+                </h:form>
+            </p:dialog>
+        </ui:define>
+    </ui:composition>
+</h:body>
+</html>

@@ -1,0 +1,15 @@
+<binding name="binding" package="entity">
+  <mapping abstract="true" type-name="descriptionList" class="entity.DescriptionList">
+    <collection field="list" usage="optional" create-type="java.util.ArrayList">
+      <structure type="entity.Description" name="description">
+        <value style="element" name="serialNumber" field="serialNumber" usage="optional"/>
+        <value style="element" name="name" field="name" usage="optional"/>
+        <value style="element" name="description" field="description" usage="optional"/>
+        <value style="attribute" name="productionDate" field="productionDate" usage="optional"/>
+      </structure>
+    </collection>
+  </mapping>
+  <mapping class="entity.DescriptionList" name="descriptionList">
+    <structure map-as="descriptionList"/>
+  </mapping>
+</binding>
