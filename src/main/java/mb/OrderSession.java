@@ -31,19 +31,16 @@ public class OrderSession {
 
     public void newOrder() {
         orderItems = new OrderItems();
-
         try {
-
             WebCalendar service = new WebCalendarService().getWebCalendarPort();
             orderItems.setCreatedDate(service.getCalendar().toGregorianCalendar());
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             logger.info("WebCalendar is not available.");
         }
     }
 
-    public String actionOrder(OrderItems orderItems){
-        this.orderItems=orderItems;
+    public String actionOrder(OrderItems orderItems) {
+        this.orderItems = orderItems;
         return "/itemList";
     }
 }

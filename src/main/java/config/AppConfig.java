@@ -22,7 +22,7 @@ import java.util.Properties;
 @Configuration
 @EnableTransactionManagement
 @EnableJpaRepositories("repository")
-@ComponentScan("services")
+@ComponentScan({"services", "util"})
 @PropertySource("classpath:db.properties")
 public class AppConfig {
     @Resource
